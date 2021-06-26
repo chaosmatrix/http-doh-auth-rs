@@ -62,7 +62,7 @@ impl HttpContext for UpstreamCall {
         let _headers = self.get_http_request_headers();
         for _i in 0.._headers.len() {
             proxy_wasm::hostcalls::log(
-                LogLevel::Info,
+                LogLevel::Debug,
                 format!("header: '{:?} = {:?}'", _headers[_i].0, _headers[_i].1).as_str(),
             );
             if _headers[_i].0 == _client_ip_header {
@@ -70,10 +70,6 @@ impl HttpContext for UpstreamCall {
                 //break;
             }
         }
-        proxy_wasm::hostcalls::log(
-            LogLevel::Info,
-            format!("doh_uri: '{:?}', client_ip: '{:?}'", "", _client_ip).as_str(),
-        );
 
         // https://dns.google.com/query?name=8.8.8.8.in-addr.arpa&rr_type=PTR&ecs=
         let mut doh_uri = String::new();
@@ -81,7 +77,7 @@ impl HttpContext for UpstreamCall {
         doh_uri.push_str(ipv42arpa(_client_ip).as_str());
         doh_uri.push_str("&type=PTR");
         proxy_wasm::hostcalls::log(
-            LogLevel::Info,
+            LogLevel::Debug,
             format!(
                 "doh_uri: '{:?}', client_ip: '{:?}'",
                 doh_uri.as_str(),
