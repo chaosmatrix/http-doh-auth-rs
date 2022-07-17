@@ -21,9 +21,12 @@ jobs:
         run: cargo build --target=wasm32-unknown-unknown --release
       - name: Package
         run: |
-          cp ./target/wasm32-unknown-unknown/release/http_doh_auth_rs.wasm ./http_doh_auth_rs-${GITHUB_REF##*/}
-          tar -zcf ./http_doh_auth_rs-${GITHUB_REF##*/}-linux.tar.gz ./http_doh_auth_rs-${GITHUB_REF##*/}
-      - name: Upload executable
+          mkdir -p ./etc/envoy
+          cp ./target/wasm32-unknown-unknown/release/${GITHUB_REPOSITORY##*/}.wasm ./etc/envoy/${GITHUB_REPOSITORY##*/}.wasm
+          cp example/*.yaml ./etc/envoy/
+          tar -zcf ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}-wasm.tar.gz ./etc/envoy
+          sha256sum ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}-wasm.tar.gz >> ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}.sha256sum
+          bash ./.github/workflows/upload_asset.sh ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}-wasm.tar.gz $GITHUB_TOKEN
+      - name: Upload checksum
         run: |
-          bash ./.github/workflows/upload_asset.sh \
-            ./http_doh_auth_rs-${GITHUB_REF##*/}-linux.tar.gz $GITHUB_TOKEN
+          bash ./.github/workflows/upload_asset.sh ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}.sha256sum $GITHUB_TOKEN
