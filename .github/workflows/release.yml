@@ -22,11 +22,12 @@ jobs:
       - name: Package
         run: |
           mkdir -p ./etc/envoy
-          cp ./target/wasm32-unknown-unknown/release/${GITHUB_REPOSITORY##*/}.wasm ./etc/envoy/${GITHUB_REPOSITORY##*/}.wasm
+          build_repo_name=`echo ${GITHUB_REPOSITORY##*/} | tr '-' '_'`
+          cp ./target/wasm32-unknown-unknown/release/${build_repo_name}.wasm ./etc/envoy/${build_repo_name}.wasm
           cp example/*.yaml ./etc/envoy/
-          tar -zcf ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}-wasm.tar.gz ./etc/envoy
-          sha256sum ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}-wasm.tar.gz >> ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}.sha256sum
-          bash ./.github/workflows/upload_asset.sh ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}-wasm.tar.gz $GITHUB_TOKEN
+          tar -zcf ./${build_repo_name}-${GITHUB_REF##*/}-wasm.tar.gz ./etc/envoy
+          sha256sum ./${build_repo_name}-${GITHUB_REF##*/}-wasm.tar.gz >> ./${build_repo_name}-${GITHUB_REF##*/}.sha256sum
+          bash ./.github/workflows/upload_asset.sh ./${build_repo_name}-${GITHUB_REF##*/}-wasm.tar.gz $GITHUB_TOKEN
       - name: Upload checksum
         run: |
-          bash ./.github/workflows/upload_asset.sh ./${GITHUB_REPOSITORY##*/}-${GITHUB_REF##*/}.sha256sum $GITHUB_TOKEN
+          bash ./.github/workflows/upload_asset.sh ./${build_repo_name}-${GITHUB_REF##*/}.sha256sum $GITHUB_TOKEN
